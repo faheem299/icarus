@@ -2,7 +2,7 @@ import os
 import httpx
 from dotenv import load_dotenv
 from qdrant_client import QdrantClient
-from sentence_transformers import SentenceTransformer
+from fastembed import TextEmbedding
 
 load_dotenv()
 
@@ -14,7 +14,7 @@ QDRANT_URL = os.getenv("QDRANT_URL")
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
 COLLECTION_NAME = "icarus_lore"
 
-embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
+embedding_model = TextEmbedding(model_name="BAAI/bge-small-en-v1.5")
 qdrant = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
 
 SYSTEM_PROMPT = (
@@ -26,7 +26,7 @@ SYSTEM_PROMPT = (
 )
 
 def retrieve_context(query: str, top_k: int = 3) -> list[str]:
-    query_vector = embedding_model.encode(query).tolist()
+    query_vector = list(embedding_model.embed([query]))[0].tolist()
     results = qdrant.query_points(
         collection_name=COLLECTION_NAME,
         query=query_vector,
