@@ -3,6 +3,10 @@ from dotenv import load_dotenv
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct
 from sentence_transformers import SentenceTransformer
+from fastembed import TextEmbedding
+
+# ...
+
 
 load_dotenv()
 
@@ -18,14 +22,15 @@ def load_passages(path="data/icarus_lore.txt"):
 
 def main():
     print("Loading embedding model...")
-    model = SentenceTransformer("all-MiniLM-L6-v2")
+    model = TextEmbedding(model_name="BAAI/bge-small-en-v1.5")
+    
 
     print("Loading passages...")
     passages = load_passages()
     print(f"Found {len(passages)} passages.")
 
     print("Generating embeddings...")
-    embeddings = model.encode(passages)
+    embeddings = list(model.embed(passages))
 
     print("Connecting to Qdrant...")
     client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
