@@ -3,4 +3,4 @@ uvicorn
 python-dotenv
 httpx
 qdrant-client
-sentence-transformers
+fastembed
